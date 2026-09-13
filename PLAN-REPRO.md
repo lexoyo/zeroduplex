@@ -178,7 +178,7 @@ Le prototype d'agrégateur a mesuré, sur un jeu de validation fermé, que le ch
 
 **Ce qui n'est PAS démontré non plus : que ces 68 mots changent une décision.** La fidélité du texte n'est pas la justesse de la détection. Le test est simple — corriger, relancer le banc de l'étape 2, regarder si la justesse bouge.
 
-Si elle ne bouge pas, l'agrégateur aura été un travail propre sans effet sur microturn, et il faudra l'écrire. Le reste du prototype (les trois tiers de stabilité, le curseur de tolérance) est de la spec pour la bibliothèque, pas un gain pour aujourd'hui — et le coude coûte 0,50 s de latence médiane, 1,25 s au p90, soit un tick entier de retard dans le pire cas.
+Si elle ne bouge pas, l'agrégateur aura été un travail propre sans effet sur zeroduplex, et il faudra l'écrire. Le reste du prototype (les trois tiers de stabilité, le curseur de tolérance) est de la spec pour la bibliothèque, pas un gain pour aujourd'hui — et le coude coûte 0,50 s de latence médiane, 1,25 s au p90, soit un tick entier de retard dans le pire cas.
 
 ---
 

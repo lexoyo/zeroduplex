@@ -1,6 +1,6 @@
 # Mesures
 
-Tout ce qui a été mesuré pendant la construction de `microturn`, avec la méthode et ses limites. Rien n'est extrapolé sans le dire.
+Tout ce qui a été mesuré pendant la construction de `zeroduplex`, avec la méthode et ses limites. Rien n'est extrapolé sans le dire.
 
 **Deux machines** : `shiao`, un laptop i7-7500U (2 cœurs / 4 threads, 7,5 Go), et `raspi2`, un Raspberry Pi 3B (4× Cortex-A53 @1,2 GHz, 905 Mio, sans GPU). **Audio de test** : deux enregistrements réels d'une voix française, 20 s chacun, 16 kHz mono — l'un à un mètre du micro, l'autre à trois.
 

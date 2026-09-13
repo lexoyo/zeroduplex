@@ -22,11 +22,11 @@ import tts  # noqa: E402
 
 
 # Le Pi synthétise trois fois plus lentement que ce PC : un test calibré ici
-# échoue là-bas sans qu'il y ait de bug. `MICROTURN_TEST_LENT` allonge les
+# échoue là-bas sans qu'il y ait de bug. `ZERODUPLEX_TEST_LENT` allonge les
 # attentes. C'était le même travers que l'ancien `ATTAQUE_S`, calibré sur la
 # mauvaise machine ; le rapport de puissance y est désormais un réglage nommé
-# (`MICROTURN_TTS_RTF`), pas une constante muette.
-LENT = float(os.environ.get("MICROTURN_TEST_LENT", "1"))
+# (`ZERODUPLEX_TTS_RTF`), pas une constante muette.
+LENT = float(os.environ.get("ZERODUPLEX_TEST_LENT", "1"))
 
 # Phrases de longueurs étagées, pour confronter l'estimation par caractères aux
 # WAV réellement produits. Tolérance : la synthèse de piper est bruitée

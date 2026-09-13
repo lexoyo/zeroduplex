@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Étage décision de microturn — le modèle tient lieu de détecteur de tour de parole.
+"""Étage décision de zeroduplex — le modèle tient lieu de détecteur de tour de parole.
 
 Toutes les `TICK_S` secondes, on lui envoie ce qui vient d'être transcrit, ou le
 marqueur de silence si rien n'a été dit. Il répond par l'état qu'il perçoit — ça
@@ -26,12 +26,12 @@ ICI = os.path.dirname(os.path.abspath(__file__))
 # donne une copie du catalogue, la patche, et ne dérange personne. Sans ça, deux
 # mesures concurrentes se disputent `locales/fr.toml` et l'une des deux évalue
 # un prompt qu'elle n'a pas écrit.
-LOCALES = os.environ.get("MICROTURN_LOCALES") or os.path.join(ICI, "locales")
+LOCALES = os.environ.get("ZERODUPLEX_LOCALES") or os.path.join(ICI, "locales")
 # Banc « détection seule » : retirer "r" du SCHÉMA, et pas seulement du prompt.
 # Sans ça la consigne « ne rends que le marqueur » reste facultative — mesuré le
 # 02/09/2026 : le modèle a quand même produit une réponse dans 23 décisions sur
 # 39, et la variante ne mesurait donc pas ce qu'elle prétendait mesurer.
-SANS_R = bool(os.environ.get("MICROTURN_SANS_R"))
+SANS_R = bool(os.environ.get("ZERODUPLEX_SANS_R"))
 
 # Mesuré sur 12 cas, les deux classes comptées séparément : les Llama 3.2 (1b
 # comme 3b) ne disent JAMAIS « c'est fini » — 0 question détectée sur 5, quel que
@@ -51,7 +51,7 @@ SANS_R = bool(os.environ.get("MICROTURN_SANS_R"))
 # `qwen/qwen-2.5-7b-instruct` — même famille, même taille (`ARTICLE-NOTES.md`).
 # gemini-2.5-flash-lite reste le témoin de ce qu'un bon modèle sait faire, et il
 # vaut mieux : 14/16 fins de tour contre 9/16 pour qwen non fine-tuné.
-MODEL = os.environ.get("MICROTURN_MODEL", "qwen/qwen-2.5-7b-instruct")
+MODEL = os.environ.get("ZERODUPLEX_MODEL", "qwen/qwen-2.5-7b-instruct")
 HOST, PATH = "openrouter.ai", "/api/v1/chat/completions"
 
 # Le décideur par défaut du projet est LOCAL, et c'est le modèle de base des
@@ -62,17 +62,17 @@ HOST, PATH = "openrouter.ai", "/api/v1/chat/completions"
 # fait partie de l'écart mesuré, elle n'est pas neutre.
 #
 # Une clé OpenRouter reprend la main : si `.env` en contient une, le décideur
-# repasse distant sur le modèle désigné par MICROTURN_MODEL. MICROTURN_LOCAL
+# repasse distant sur le modèle désigné par ZERODUPLEX_MODEL. ZERODUPLEX_LOCAL
 # tranche explicitement dans les deux sens (1 = local même avec une clé,
 # 0 = distant, et l'absence de clé devient alors une erreur).
 MODELE_LOCAL = os.environ.get(
-    "MICROTURN_MODELE_LOCAL",
+    "ZERODUPLEX_MODELE_LOCAL",
     os.path.join(ICI, "models", "Qwen2.5-7B-Instruct-Q4_K_M.gguf"))
-CTX_LOCAL = int(os.environ.get("MICROTURN_CTX", "4096"))
+CTX_LOCAL = int(os.environ.get("ZERODUPLEX_CTX", "4096"))
 # 0 = tout sur le CPU. Sur un GPU de 4 Gio, Q4_K_M ne tient pas en entier ;
 # décharger une partie des couches reste gagnant, d'où le réglage explicite.
-COUCHES_GPU = int(os.environ.get("MICROTURN_GPU_LAYERS", "0"))
-TIMEOUT = float(os.environ.get("MICROTURN_TIMEOUT", "1.5"))
+COUCHES_GPU = int(os.environ.get("ZERODUPLEX_GPU_LAYERS", "0"))
+TIMEOUT = float(os.environ.get("ZERODUPLEX_TIMEOUT", "1.5"))
 # La longueur de la réponse est suggérée par le SCHÉMA, plus par `max_tokens`.
 #
 # `max_tokens` était à 60 et il coupait pour de vrai : la troncature casse le
@@ -309,7 +309,7 @@ KEY = _key()          # lue une fois, pas à chaque décision
 
 def _local_par_defaut():
     """Local ou distant, avant toute option de ligne de commande."""
-    choix = os.environ.get("MICROTURN_LOCAL")
+    choix = os.environ.get("ZERODUPLEX_LOCAL")
     if choix is not None:
         return choix not in ("0", "", "non")
     return KEY is None

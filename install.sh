@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installe ce que microturn attend : l'environnement Python et les modèles.
+# Installe ce que zeroduplex attend : l'environnement Python et les modèles.
 #
 # Idempotent : ce qui est déjà là n'est pas retéléchargé. Sûr à relancer.
 #
@@ -9,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-TOUT=${MICROTURN_INSTALL_TOUT:-0}       # 1 = aussi l'anglais et les voix en plus
+TOUT=${ZERODUPLEX_INSTALL_TOUT:-0}       # 1 = aussi l'anglais et les voix en plus
 
 dit() { printf '  %s\n' "$*"; }
 titre() { printf '\n== %s\n' "$*"; }
@@ -71,10 +71,10 @@ titre "Décideur — Qwen2.5-7B-Instruct, en local (le défaut)"
 # Q4_K_M — 4,4 Gio — parce qu'il faut tenir sur une machine ordinaire ; eux
 # servent le modèle en pleine précision, et cet écart-là compte dans les chiffres.
 # ⚠️ Inutile sur la cible Pi 3B, qui n'a que 905 Mio : là-bas, une clé OpenRouter
-# dans .env fait repasser le décideur en distant, et MICROTURN_SANS_LOCAL=1 évite
+# dans .env fait repasser le décideur en distant, et ZERODUPLEX_SANS_LOCAL=1 évite
 # de télécharger 4,4 Gio pour rien.
-if [ "${MICROTURN_SANS_LOCAL:-0}" = 1 ]; then
-    dit "sauté (MICROTURN_SANS_LOCAL=1) — il faudra une clé OpenRouter"
+if [ "${ZERODUPLEX_SANS_LOCAL:-0}" = 1 ]; then
+    dit "sauté (ZERODUPLEX_SANS_LOCAL=1) — il faudra une clé OpenRouter"
 else
     recupere models/Qwen2.5-7B-Instruct-Q4_K_M.gguf \
         https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF/resolve/main/Qwen2.5-7B-Instruct-Q4_K_M.gguf
@@ -85,7 +85,7 @@ fi
 titre "Voix — piper"
 # Le binaire piper n'est PAS installé ici : il est distribué en archive par
 # plateforme. Sans lui, `--tts espeak` fonctionne (5 Mo, qualité moindre).
-if [ -x "${MICROTURN_PIPER:-$HOME/.local/bin/piper}" ]; then
+if [ -x "${ZERODUPLEX_PIPER:-$HOME/.local/bin/piper}" ]; then
     dit "binaire piper présent"
     V=$HOME/.local/share/piper
     B=https://huggingface.co/rhasspy/piper-voices/resolve/main
@@ -110,4 +110,4 @@ done
 titre "Vérification"
 .venv/bin/python -c "import stt; print('  sherpa fr :', stt.Sherpa._suffixe('$FR'))"
 printf '\nPrêt.  .venv/bin/python pipeline.py --trace sessions/\n'
-printf 'Anglais et voix supplémentaires : MICROTURN_INSTALL_TOUT=1 ./install.sh\n\n'
+printf 'Anglais et voix supplémentaires : ZERODUPLEX_INSTALL_TOUT=1 ./install.sh\n\n'

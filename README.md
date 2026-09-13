@@ -1,10 +1,10 @@
-# microturn
+# zeroduplex
 
 **A reimplementation of [DuplexCascade](https://arxiv.org/abs/2603.09180) that runs on consumer hardware, using prompting instead of fine-tuning.**
 
 Researchers at SB Intuitions showed that a language model can hold a *full-duplex* conversation — listening continuously and deciding **on its own** when to reply, with no silence detector, no wake word and no button — provided you fine-tune it with LoRA.
 
-microturn takes their mechanism and **trains nothing**: the same decision comes from a prompt.
+zeroduplex (formerly microturn) takes their mechanism and **trains nothing**: the same decision comes from a prompt.
 
 The other difference is the machine. **Their implementation needs about 20 GiB of GPU memory** — three Kyutai models plus a Qwen2-7B. This one runs on **any computer**, down to a **Raspberry Pi**: speech recognition and speech synthesis are small and local, and the only heavy part is the decision itself — which is a call to whatever model you are testing, local or remote.
 
@@ -172,19 +172,19 @@ Their backchannel evaluator needs `torchaudio` and `silero-vad`; the others need
 | variable | role | default |
 |---|---|---|
 | `OPENROUTER_API_KEY` | present = remote decider, absent = local decider | — |
-| `MICROTURN_MODEL` | remote model | `qwen/qwen-2.5-7b-instruct` |
-| `MICROTURN_LOCAL` | force the choice: `1` local, `0` remote | follows the key |
-| `MICROTURN_MODELE_LOCAL` | GGUF path | `models/Qwen2.5-7B-Instruct-Q4_K_M.gguf` |
-| `MICROTURN_CTX` | llama.cpp context | `4096` |
-| `MICROTURN_GPU_LAYERS` | layers offloaded to the GPU | `0` |
-| `MICROTURN_TIMEOUT` | remote call timeout, seconds | `1.5` |
-| `MICROTURN_SHERPA` | speech recognition model directory | follows `--langue` |
-| `MICROTURN_WHISPER` | fallback model | `models/ggml-tiny-q5_1.bin` |
-| `MICROTURN_TTS` | speech engine | `piper` |
-| `MICROTURN_PIPER` | piper binary | `~/.local/bin/piper` |
-| `MICROTURN_VOICE` | piper voice | `fr_FR-siwis-medium.onnx` |
+| `ZERODUPLEX_MODEL` | remote model | `qwen/qwen-2.5-7b-instruct` |
+| `ZERODUPLEX_LOCAL` | force the choice: `1` local, `0` remote | follows the key |
+| `ZERODUPLEX_MODELE_LOCAL` | GGUF path | `models/Qwen2.5-7B-Instruct-Q4_K_M.gguf` |
+| `ZERODUPLEX_CTX` | llama.cpp context | `4096` |
+| `ZERODUPLEX_GPU_LAYERS` | layers offloaded to the GPU | `0` |
+| `ZERODUPLEX_TIMEOUT` | remote call timeout, seconds | `1.5` |
+| `ZERODUPLEX_SHERPA` | speech recognition model directory | follows `--langue` |
+| `ZERODUPLEX_WHISPER` | fallback model | `models/ggml-tiny-q5_1.bin` |
+| `ZERODUPLEX_TTS` | speech engine | `piper` |
+| `ZERODUPLEX_PIPER` | piper binary | `~/.local/bin/piper` |
+| `ZERODUPLEX_VOICE` | piper voice | `fr_FR-siwis-medium.onnx` |
 
-The code reads about a dozen more that only serve the bench and the tests (`MICROTURN_LOCALES`, `MICROTURN_SANS_R`, `MICROTURN_TICKS_SILENCE`…). They are documented where they are used, under `bench/`.
+The code reads about a dozen more that only serve the bench and the tests (`ZERODUPLEX_LOCALES`, `ZERODUPLEX_SANS_R`, `ZERODUPLEX_TICKS_SILENCE`…). They are documented where they are used, under `bench/`.
 
 </details>
 

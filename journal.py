@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Trace de session de microturn — pour rejouer et comprendre après coup.
+"""Trace de session de zeroduplex — pour rejouer et comprendre après coup.
 
 Sans `--trace`, ce module n'est même pas importé par la boucle : rien n'est
 ouvert, rien n'est sérialisé, aucun thread ne tourne. C'est la condition pour

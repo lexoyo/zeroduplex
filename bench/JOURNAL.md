@@ -612,7 +612,7 @@ tailles de tampon :
 ```
 
 **Cent microsecondes de tampon ne gagnent qu'un dixième de seconde.** Le tampon
-n'est pas coupable, et `MICROTURN_APLAY_BUFFER` reste à 0 par défaut.
+n'est pas coupable, et `ZERODUPLEX_APLAY_BUFFER` reste à 0 par défaut.
 
 La mesure ci-dessus est un temps de bout en bout, durée de l'audio comprise
 (~1,3 s) : la latence de démarrage d'ALSA est donc d'environ 0,3 s. Le reste
@@ -716,7 +716,7 @@ Les trois premières ont rendu 0,715 trois fois de suite, au millième :
 
 1. les patchs ne touchaient que `systeme`, alors que la session utilise
    `systeme_sherpa` ;
-2. `serie.py` avait perdu `MICROTURN_SESSIONS` et mesurait les sessions whisper ;
+2. `serie.py` avait perdu `ZERODUPLEX_SESSIONS` et mesurait les sessions whisper ;
 3. mes correctifs de `serie.py` échouaient sur leur assertion **sans rien
    écrire**, et je ne lisais que la sortie qui suivait.
 
@@ -802,7 +802,7 @@ plusieurs secondes.
 attrapé le bug n° 2 dès sa première exécution.
 
 Et une constante de plus calibrée sur la mauvaise machine : les délais du test
-lui-même. `MICROTURN_TEST_LENT=3` sur le Pi. Après `ATTAQUE_S` (facteur 3),
+lui-même. `ZERODUPLEX_TEST_LENT=3` sur le Pi. Après `ATTAQUE_S` (facteur 3),
 `DEBIT_CAR_S` (le robot parle 2,4 s pour 4,0 s estimées) et le nombre de threads
 de sherpa, **c'est la quatrième fois dans la journée.** Le rapport de puissance
 entre shiao et le Pi est d'environ trois, et il faut le supposer partout où une
@@ -837,7 +837,7 @@ pipeline **ne prend jamais la parole**, et le banc rend 0,500. C'est le piège d
 candidat 59, en pire — là le chiffre était visiblement absurde, ici il est
 plausible. Un système muet et un système bavard rendent tous les deux 0,500.
 
-Le harnais a donc été adapté, **pas le prompt** : `MICROTURN_MARQUEUR_SEUL`
+Le harnais a donc été adapté, **pas le prompt** : `ZERODUPLEX_MARQUEUR_SEUL`
 (pipeline.py) fait valoir le marqueur seul comme décision de parler, avec un
 texte de remplissage de **55 caractères** — la médiane exacte des réponses de la
 base, pour que la durée simulée de parole ne change pas. L'historique, lui, est
@@ -848,7 +848,7 @@ Et un second garde-fou, trouvé en cours de route : la consigne ne suffit pas.
 Avec le schéma JSON inchangé, `"r"` reste autorisé, et le modèle a produit une
 réponse dans **23 décisions sur 39** malgré une consigne qui l'interdit
 explicitement. La variante « A » ne mesurait donc pas ce qu'elle annonçait.
-D'où `MICROTURN_SANS_R` (llm.py), qui retire `"r"` du schéma : là, 0 réponse
+D'où `ZERODUPLEX_SANS_R` (llm.py), qui retire `"r"` du schéma : là, 0 réponse
 sur 33.
 
 ### Quatre variantes, parce que « retirer la réponse » est deux changements
@@ -1279,7 +1279,7 @@ en quatre bras pour qu'on sache lequel fait quoi :
   repliage.
 - **B** — le repliage ne se déclenche plus sur le silence mais sur la
   **répétition** : `action == derniere_action and delta == dernier_delta`. Le
-  micro-tour replié porte un suffixe `×{n}`, réglable par `MICROTURN_REPETE`.
+  micro-tour replié porte un suffixe `×{n}`, réglable par `ZERODUPLEX_REPETE`.
 
 Sessions `20260829-032332-sherpa` et `20260829-073852-sherpa`, rejeu `--muet`
 déterministe, 17 fins de tour et 29 pauses, prompt `systeme_sherpa`. **Trois

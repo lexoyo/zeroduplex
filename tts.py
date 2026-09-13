@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Étage TTS de microturn — parole non bloquante et interruptible.
+"""Étage TTS de zeroduplex — parole non bloquante et interruptible.
 
 `say()` rend la main immédiatement : la synthèse et la lecture tournent dans des
 processus fils. `stop()` les tue net — c'est le geste du barge-in.
 
-Deux moteurs, choisis par MICROTURN_TTS :
+Deux moteurs, choisis par ZERODUPLEX_TTS :
   piper   : voix naturelle. **Résident depuis le 03/09** — le modèle n'est plus
             rechargé à chaque phrase, ce qui économisait ~8 s par réponse sur un
             Pi 3B. Il écrit un WAV par phrase, qu'`aplay` joue d'un bloc.
@@ -21,31 +21,31 @@ le quoting, un /bin/sh par phrase, et les surprises de `echo` sous dash (Pi OS).
 import atexit, glob, json, os, random, shutil, signal, subprocess, tempfile
 import threading, time, wave
 
-ENGINE = os.environ.get("MICROTURN_TTS", "piper")
-PIPER = os.path.expanduser(os.environ.get("MICROTURN_PIPER", "~/.local/bin/piper"))
+ENGINE = os.environ.get("ZERODUPLEX_TTS", "piper")
+PIPER = os.path.expanduser(os.environ.get("ZERODUPLEX_PIPER", "~/.local/bin/piper"))
 # Le périphérique de SORTIE. `aplay` sans `-D` cherche un « default » qui
 # n'existe pas sur une image Raspberry Pi Lite : il échoue, et comme son stderr
 # part dans DEVNULL, le robot parle dans le vide sans un message. Trouvé en
 # session réelle, invisible en rejeu.
-APLAY = os.environ.get("MICROTURN_APLAY", "")
+APLAY = os.environ.get("ZERODUPLEX_APLAY", "")
 # Taille du tampon de sortie ALSA, en microsecondes. Par défaut `aplay` en prend
 # un très large — mesuré ~2 s sur la sortie HDMI du Pi, entre la décision de
 # parler et le premier son. C'est de la latence pure, invisible dans nos traces
 # puisqu'elle se produit après tout ce qu'on mesure.
 # 0 = laisser ALSA choisir (comportement d'avant).
-APLAY_BUFFER_US = int(os.environ.get("MICROTURN_APLAY_BUFFER", "0"))
+APLAY_BUFFER_US = int(os.environ.get("ZERODUPLEX_APLAY_BUFFER", "0"))
 VOICE = os.path.expanduser(os.environ.get(
-    "MICROTURN_VOICE", "~/.local/share/piper/fr_FR-siwis-medium.onnx"))
+    "ZERODUPLEX_VOICE", "~/.local/share/piper/fr_FR-siwis-medium.onnx"))
 
 
 def voix_pour(nom, defaut=VOICE):
     """Chemin du modèle piper pour un nom de voix de catalogue (« en_US-amy-medium »).
 
-    Une voix posée explicitement dans MICROTURN_VOICE l'emporte : c'est un
+    Une voix posée explicitement dans ZERODUPLEX_VOICE l'emporte : c'est un
     réglage de la machine, le catalogue n'est qu'un défaut par langue.
     Si le fichier n'existe pas on garde le défaut — mieux vaut la mauvaise
     langue qu'un système muet sans un mot d'explication."""
-    if os.environ.get("MICROTURN_VOICE") or not nom:
+    if os.environ.get("ZERODUPLEX_VOICE") or not nom:
         return defaut
     chemin = os.path.join(os.path.dirname(defaut), nom + ".onnx")
     return chemin if os.path.exists(chemin) else defaut
@@ -62,7 +62,7 @@ def voice_rate(voice=VOICE, default=22050):
 
 
 ICI = os.path.dirname(os.path.abspath(__file__))
-CLIPS = os.environ.get("MICROTURN_CLIPS") or os.path.join(ICI, "clips")
+CLIPS = os.environ.get("ZERODUPLEX_CLIPS") or os.path.join(ICI, "clips")
 
 
 class Clips:
@@ -194,7 +194,7 @@ PAROLE_DEFAUT = PAROLE_PAR_VOIX["fr_FR-siwis-medium"]
 # sur des WAV de silence de 0,5 / 1 / 3 s : 0,25 s médian, constant, donc
 # indépendant de la durée du fichier.) Cohérent avec les ~0,3 s mesurés sur la
 # sortie HDMI du Pi (`ARTICLE-NOTES.md`).
-ATTAQUE_ALSA_S = float(os.environ.get("MICROTURN_TTS_ATTAQUE", "0.25"))
+ATTAQUE_ALSA_S = float(os.environ.get("ZERODUPLEX_TTS_ATTAQUE", "0.25"))
 
 # RTF_SYNTHESE_ITEM : rapport parole / synthèse, le SEUL terme dépendant de la
 # machine — et c'est là qu'est le facteur 3 des passations.
@@ -204,13 +204,13 @@ ATTAQUE_ALSA_S = float(os.environ.get("MICROTURN_TTS_ATTAQUE", "0.25"))
 #     (≈ 9,9 s de parole), et `ARTICLE-NOTES.md` chiffre à ~3 le rapport de
 #     puissance entre `shiao` et le Pi.
 # UNE constante ne peut pas être juste sur les deux machines : le rapport se
-# pose sur la cible, `MICROTURN_TTS_RTF=3` sur un Pi 3B.
+# pose sur la cible, `ZERODUPLEX_TTS_RTF=3` sur un Pi 3B.
 #
 # ⚠️ Le « ×3,0 » de `RESULTATS-PI.md` § 4 a été mesuré via `--rendu`, donc via
 # `Enregistreur._pcm`, qui relance piper à chaque phrase (~8 s de chargement sur
 # le Pi). Il mesure ce rechargement autant que le débit, et ne s'applique pas au
 # chemin livré, où piper est résident. À remesurer sur le Pi avant d'y croire.
-RTF_SYNTHESE = float(os.environ.get("MICROTURN_TTS_RTF", "9.0"))
+RTF_SYNTHESE = float(os.environ.get("ZERODUPLEX_TTS_RTF", "9.0"))
 
 
 def duree_parole(text, voice=VOICE):
@@ -266,7 +266,7 @@ class Speaker:
         self._sortie = None                  # l'`aplay` du moment
         self._gen = 0                        # invalide une phrase en vol
         self._parlant = False                # de `say()` à la fin d'`aplay`
-        self._dossier = tempfile.mkdtemp(prefix="microturn-tts-")
+        self._dossier = tempfile.mkdtemp(prefix="zeroduplex-tts-")
         self.audio_s = 0.0                   # durée du WAV de la phrase en cours
         self._ferme = False
         # Chaque WAV est effacé après lecture ; ceci n'est que la ceinture pour
@@ -678,7 +678,7 @@ class Silencieux:
 
 if __name__ == "__main__":
     import sys
-    txt = " ".join(sys.argv[1:]) or "Bonjour Alex, je suis microturn, et je parle en local."
+    txt = " ".join(sys.argv[1:]) or "Bonjour Alex, je suis zeroduplex, et je parle en local."
     for eng in ("espeak", "piper"):
         if eng == "piper" and not os.path.exists(PIPER):
             print(f"{eng:7s} absent"); continue

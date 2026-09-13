@@ -31,7 +31,7 @@ QC avant mesure (règle du 29/08/2026) :
    pipeline tombe alors dans `parler_sans_texte`, ne prend jamais la parole et
    rend 0,500 — le score d'un système muet, qui ne mesure RIEN. C'est le piège
    du candidat 59, en pire, parce que 0,500 y est plausible. Le harnais est
-   donc adapté (`MICROTURN_MARQUEUR_SEUL`, cf. pipeline.py) pour que le
+   donc adapté (`ZERODUPLEX_MARQUEUR_SEUL`, cf. pipeline.py) pour que le
    marqueur seul vaille prise de parole, avec un texte de remplissage de 55
    caractères — la médiane des réponses de la base, pour que la durée simulée
    de parole reste la même. L'historique, lui, est écrit SANS réponse.
@@ -82,18 +82,18 @@ VARIANTES = [
     ("B · consigne + exemples sans réponse (détection pure)", b_detection_pure),
 ]
 
-# Les MÊMES deux patches, relancés avec MICROTURN_SANS_R=1, donnent les deux
+# Les MÊMES deux patches, relancés avec ZERODUPLEX_SANS_R=1, donnent les deux
 # variantes qui comptent vraiment — celles où "r" est retiré du SCHÉMA, donc
 # mécaniquement impossible à produire :
 #
-#   C  = a_consigne_seule + MICROTURN_SANS_R=1   (détection seule, mais les
+#   C  = a_consigne_seule + ZERODUPLEX_SANS_R=1   (détection seule, mais les
 #                                                 exemples montrent encore des
 #                                                 réponses)
-#   B' = b_detection_pure + MICROTURN_SANS_R=1   (détection pure, imposée)
+#   B' = b_detection_pure + ZERODUPLEX_SANS_R=1   (détection pure, imposée)
 #
 # La commande complète, telle qu'elle a servi le 02/09/2026 :
 #
-#   MICROTURN_SANS_R=1 \
-#   MICROTURN_SESSIONS="sessions/20260829-032332-sherpa sessions/20260829-073852-sherpa" \
-#   MICROTURN_MARQUEUR_SEUL="(réponse simulée — banc de « détection seule », 55 car)" \
+#   ZERODUPLEX_SANS_R=1 \
+#   ZERODUPLEX_SESSIONS="sessions/20260829-032332-sherpa sessions/20260829-073852-sherpa" \
+#   ZERODUPLEX_MARQUEUR_SEUL="(réponse simulée — banc de « détection seule », 55 car)" \
 #   .venv/bin/python bench/serie.py bench/variantes7.py

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source audio unique de microturn — micro ou fichier, même contrat.
+"""Source audio unique de zeroduplex — micro ou fichier, même contrat.
 
 Un seul endroit qui sait produire du PCM 16 kHz mono, pour que le banc de mesure
 et le pipeline mesurent exactement la même chose.

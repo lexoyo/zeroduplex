@@ -1,4 +1,4 @@
-# microturn — notes pour un article
+# zeroduplex — notes pour un article
 
 Journal des décisions et des découvertes, tenu au fil de l'eau. Ce fichier garde le **pourquoi** ; `bench/JOURNAL.md` garde les chiffres, `bench/CANDIDATS.md` la file de tests, `FORMAT-CHERCHEURS.md` ce qu'on a constaté chez eux.
 
@@ -10,7 +10,7 @@ Journal des décisions et des découvertes, tenu au fil de l'eau. Ce fichier gar
 
 DuplexCascade (arXiv 2603.09180) fait tenir une conversation vocale sans détecteur de parole : ASR → LLM → TTS, micro-tours à horloge fixe, et c'est le modèle qui décide s'il doit parler, au moyen de jetons de contrôle décrivant l'état de l'**utilisateur**. Ils obtiennent 0,858 de justesse moyenne sur Full-Duplex-Bench, avec un Qwen2-7B fine-tuné en LoRA (8×H100, 5 heures) — **à un pas d'horloge de 0,6 s**, ce qui n'est pas le nôtre (voir plus bas).
 
-**La question de microturn : est-ce que ça se transpose par prompting ?** Sans entraînement, sur un modèle hébergé, avec un Raspberry Pi 3B au bout.
+**La question de zeroduplex : est-ce que ça se transpose par prompting ?** Sans entraînement, sur un modèle hébergé, avec un Raspberry Pi 3B au bout.
 
 ## Ce qui est établi, par la mesure
 
@@ -92,10 +92,10 @@ Deux choses à en tirer, et la seconde est la plus utile :
 | | justesse | fins de tour | pauses ratées | latence |
 |---|---|---|---|---|
 | DuplexCascade (Δt = 0,6 s) | 0,858 | — | — | 1,724 s |
-| microturn, base du 29/08 au matin (Δt = 1,2 s) | 0,634 | 11/17 | 11/29 | 5–7 s |
-| **microturn, configuration retenue** (Δt = 1,2 s) | **0,816 ± 0,015** | **13,8/17** | **5,2/29** | **3,55 / 3,75 s** |
+| zeroduplex, base du 29/08 au matin (Δt = 1,2 s) | 0,634 | 11/17 | 11/29 | 5–7 s |
+| **zeroduplex, configuration retenue** (Δt = 1,2 s) | **0,816 ± 0,015** | **13,8/17** | **5,2/29** | **3,55 / 3,75 s** |
 
-Les deux lignes microturn portent sur les **mêmes deux sessions** (`032332` et `073852`), rejouées en déterministe : elles sont comparables entre elles. La ligne DuplexCascade ne l'est pas — c'est leur banc, leur corpus, leur mesure.
+Les deux lignes zeroduplex portent sur les **mêmes deux sessions** (`032332` et `073852`), rejouées en déterministe : elles sont comparables entre elles. La ligne DuplexCascade ne l'est pas — c'est leur banc, leur corpus, leur mesure.
 
 ⚠️ **Ce tableau a été corrigé le 03/09 au soir, sur lecture du PDF** (Tableau 1 p. 3, § 4.4 p. 4 ; détail en `PAPIER.md` § 5) :
 
@@ -159,7 +159,7 @@ Ce que coûte l'original : Qwen2-7B fine-tuné en LoRA, 8×H100 pendant 5 heures
 - **Le ratio synthèse / audio reste le chiffre qui décide, mais il ne décide plus la même chose.** `medium` synthétise **2,97 s pour 3,20 s d'audio, soit 0,93 — 7 % de marge** ; `low` est à 0,58. Tant qu'il y avait des morceaux, ce ratio décidait si la parole se trouait en son milieu. Depuis que la phrase part d'un bloc, **il ne décide plus d'un trou mais d'un délai** : au-dessus de 1, le temps d'attente avant le premier son dépasse la durée de ce qu'on va entendre. **Décision d'architecture du 02/09, toujours valable : le TTS est le goulot du Pi pour une raison structurelle, pas par lenteur.** Le Pi passe la chaîne complète à demi-fréquence (600 MHz, `RESULTATS-PI.md` §5), et le ratio de `medium` passe alors au-dessus de 1. ⚠️ **C'est une inférence, pas une mesure** : le lien throttling → ratio > 1 n'a jamais été mesuré directement. Le repli existe (`low`, ratio 0,58) mais échantillonne à 16 kHz au lieu de 22 — arbitrage de qualité à trancher à l'oreille. Protocole en `IDEES.md` § 12.
 - **Les deux secondes avant le son n'étaient pas le tampon ALSA.** Symptôme rapporté par Alex en session : « deux secondes entre le moment où il écrit qu'il va dire quelque chose et le moment où je l'entends ». Quatre tailles de tampon testées sur le HDMI du Pi : 1,64 s au défaut, 1,54 s à 100 ms de tampon. **Cent millisecondes de tampon ne gagnent qu'un dixième de seconde.** Le démarrage d'ALSA vaut ~0,3 s ; le reste est la synthèse elle-même. Un soupçon d'infrastructure levé par une mesure de dix minutes — et le réglage reste désactivé par défaut.
 - **Le défaut de constante qui ne se voit que sur la cible** : `ATTAQUE_S` et `DEBIT_CAR_S`, justes à 5 % sur un laptop, sous-estiment d'un facteur 3 sur le Pi. Le système se croit muet pendant qu'il parle encore.
-- **Et ce n'est pas un incident isolé : quatre constantes calibrées sur la mauvaise machine dans la même journée.** `ATTAQUE_S`, `DEBIT_CAR_S`, le nombre de threads de sherpa (4 sur le laptop, 2 sur le Pi), puis les délais du test de son lui-même (`MICROTURN_TEST_LENT=3`). **Le rapport de puissance entre `shiao` et le Pi est d'environ trois, et il faut le supposer partout où une durée est écrite en dur.** C'est la formulation générale de la leçon, et elle vaut mieux que l'anecdote : sur une cible embarquée, toute constante de temps est un réglage de machine déguisé en constante physique.
+- **Et ce n'est pas un incident isolé : quatre constantes calibrées sur la mauvaise machine dans la même journée.** `ATTAQUE_S`, `DEBIT_CAR_S`, le nombre de threads de sherpa (4 sur le laptop, 2 sur le Pi), puis les délais du test de son lui-même (`ZERODUPLEX_TEST_LENT=3`). **Le rapport de puissance entre `shiao` et le Pi est d'environ trois, et il faut le supposer partout où une durée est écrite en dur.** C'est la formulation générale de la leçon, et elle vaut mieux que l'anecdote : sur une cible embarquée, toute constante de temps est un réglage de machine déguisé en constante physique.
 
 → *Sur cette machine, entraîner est hors de question. D'où la partie II.*
 
@@ -592,7 +592,7 @@ Pour le récit, c'est une bonne illustration d'un motif récurrent du projet : *
 
 Avant toute extraction de bibliothèque, un prototype isolé teste **une seule question** : à partir du texte seul, décider si une phrase est complète ou non. Pas de micro, pas d'ASR, pas de Pi.
 
-Il vit **hors du dépôt microturn**, délibérément, pour que ses mesures ne se mêlent pas à celles du projet — le fichier `RESULTATS.md` a déjà connu quatre bougés de référence en une journée (voir l'avertissement en tête de fichier), et une seconde source de chiffres portant sur une autre tâche est exactement ce qu'il ne faut pas y ajouter.
+Il vit **hors du dépôt zeroduplex**, délibérément, pour que ses mesures ne se mêlent pas à celles du projet — le fichier `RESULTATS.md` a déjà connu quatre bougés de référence en une journée (voir l'avertissement en tête de fichier), et une seconde source de chiffres portant sur une autre tâche est exactement ce qu'il ne faut pas y ajouter.
 
 **L'intérêt éditorial est qu'il réduit la thèse du projet à son os** : *la détection de fin de tour se fait sur le sens, pas sur le son.* Tout le reste — l'ASR en flux, les micro-tours à horloge fixe, le TTS, le budget de 905 Mio — est de la plomberie autour de cette affirmation. Si elle tient sur du texte nu, elle est démontrable par n'importe qui, sans matériel, en quelques lignes ; si elle ne tient pas, aucun des sept changements gardés ne compte.
 
@@ -664,7 +664,7 @@ D'où une sortie à **trois tiers** et non deux :
 | `probable` | segment courant, mots que le décodeur a dépassés et qui n'ont pas bougé depuis K blocs | heuristique de l'agrégateur |
 | `provisoire` | la queue en cours d'écriture | change au bloc suivant |
 
-**L'angle d'article** : le tier intermédiaire n'est pas une invention de microturn. Trois moteurs l'ont fabriqué séparément, chacun sous un nom différent — la `stability` de Google, le `stop_history_eou` de NVIDIA Riva, le `PREFLIGHT_TRANSCRIPT` de LiveKit (déjà noté dans `PLAN.md`, section contrat d'entrée). Quand quatre équipes qui ne se parlent pas ajoutent le même étage, ce n'est plus une coquetterie d'implémentation, c'est que le contrat à deux états est faux.
+**L'angle d'article** : le tier intermédiaire n'est pas une invention de zeroduplex. Trois moteurs l'ont fabriqué séparément, chacun sous un nom différent — la `stability` de Google, le `stop_history_eou` de NVIDIA Riva, le `PREFLIGHT_TRANSCRIPT` de LiveKit (déjà noté dans `PLAN.md`, section contrat d'entrée). Quand quatre équipes qui ne se parlent pas ajoutent le même étage, ce n'est plus une coquetterie d'implémentation, c'est que le contrat à deux états est faux.
 
 #### « Figé » ne veut pas dire « correct » — et c'est un piège de vocabulaire
 

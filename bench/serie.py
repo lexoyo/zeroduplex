@@ -6,7 +6,7 @@ boucle, et la seule façon d'attribuer un écart. Le catalogue est copié dans u
 bac à sable, patché, mesuré ; le dépôt n'est jamais touché, donc deux séries
 peuvent tourner en parallèle sans se disputer `locales/fr.toml`.
 
-    MICROTURN_SESSIONS="sessions/xxx-sherpa" python bench/serie.py variantes.py
+    ZERODUPLEX_SESSIONS="sessions/xxx-sherpa" python bench/serie.py variantes.py
 """
 import importlib.util, os, re, shutil, subprocess, sys, tempfile, time
 
@@ -15,12 +15,12 @@ BAC = tempfile.mkdtemp(prefix="locales_")
 shutil.copytree(os.path.join(ICI, "locales"), BAC, dirs_exist_ok=True)
 TOML = os.path.join(BAC, "fr.toml")
 SESSIONS = os.environ.get(
-    "MICROTURN_SESSIONS",
+    "ZERODUPLEX_SESSIONS",
     "sessions/20260829-032332 sessions/20260829-073852").split()
 
 
 def mesure(note):
-    env = dict(os.environ, MICROTURN_LOCALES=BAC)
+    env = dict(os.environ, ZERODUPLEX_LOCALES=BAC)
     r = subprocess.run(
         [sys.executable, os.path.join(ICI, "bench", "sessions.py"),
          "--sessions", *SESSIONS, "--note", note],

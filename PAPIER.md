@@ -4,15 +4,15 @@ Fiche de lecture de [arXiv 2603.09180](https://arxiv.org/abs/2603.09180), Yang, 
 
 **Français puis anglais dans chaque section.** Les chiffres sont relevés à la source, dans le PDF ; ce qui est lu sur un graphique est signalé comme tel.
 
-Reading notes on the paper microturn reimplements. **French first, English second, in every section.** Figures are taken from the PDF itself; anything read off a plot is flagged.
+Reading notes on the paper zeroduplex reimplements. **French first, English second, in every section.** Figures are taken from the PDF itself; anything read off a plot is flagged.
 
 ---
 
 ## La thèse / The thesis
 
-Les cascades ASR → LLM → TTS gardent l'intelligence du modèle de langage, mais leur découpage par détecteur de parole leur impose des tours half-duplex. Les modèles bout-en-bout font du full-duplex mais perdent en intelligence conversationnelle. La proposition : **convertir les longs tours en micro-tours par blocs**, pilotés par des **jetons de contrôle** que le modèle produit sous contrainte de streaming. C'est le mécanisme que microturn reprend, et qu'il tente d'obtenir par prompting là où eux l'obtiennent par fine-tuning.
+Les cascades ASR → LLM → TTS gardent l'intelligence du modèle de langage, mais leur découpage par détecteur de parole leur impose des tours half-duplex. Les modèles bout-en-bout font du full-duplex mais perdent en intelligence conversationnelle. La proposition : **convertir les longs tours en micro-tours par blocs**, pilotés par des **jetons de contrôle** que le modèle produit sous contrainte de streaming. C'est le mécanisme que zeroduplex reprend, et qu'il tente d'obtenir par prompting là où eux l'obtiennent par fine-tuning.
 
-Cascaded ASR → LLM → TTS keeps the language model's intelligence but its VAD segmentation forces half-duplex turns. End-to-end models are full-duplex but lose conversational ability. Their proposal: **turn long turns into block-wise micro-turns**, driven by **control tokens** the model emits under streaming constraints. That is the mechanism microturn borrows, and tries to obtain by prompting rather than fine-tuning.
+Cascaded ASR → LLM → TTS keeps the language model's intelligence but its VAD segmentation forces half-duplex turns. End-to-end models are full-duplex but lose conversational ability. Their proposal: **turn long turns into block-wise micro-turns**, driven by **control tokens** the model emits under streaming constraints. That is the mechanism zeroduplex borrows, and tries to obtain by prompting rather than fine-tuning.
 
 ## Les jetons / The tokens
 
@@ -32,7 +32,7 @@ Six control tokens plus the silence marker. The paper writes plain angle bracket
 
 ## Les réglages / The settings
 
-| | eux / them | microturn |
+| | eux / them | zeroduplex |
 |---|---|---|
 | micro-tour Δt | **0,6 s** | **1,2 s** |
 | micro-tour utilisateur | 1 à 7 tokens, tirés au hasard | le delta de l'ASR |
@@ -83,7 +83,7 @@ Between them, these two produced wrong figures in this repository. They are writ
 
 **0.955 is not a turn-end rate**, it is their take-over rate **on interruption**. It was shown against our turn-end counts for a while, which meant nothing.
 
-## Ce que ça change pour microturn / What it means here
+## Ce que ça change pour zeroduplex / What it means here
 
 Ils n'ont **pas de prompt système** : le comportement vient entièrement du fine-tuning. Il n'y a donc rien à copier de ce côté, et tout notre prompt est une invention rendue nécessaire par le fait qu'on n'entraîne pas. Parler de « conformité au papier » à propos du prompt n'a pas de sens ; ça n'en a que pour le vocabulaire des jetons et la structure des messages.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fait tourner microturn sur tout un corpus Full-Duplex-Bench.
+"""Fait tourner zeroduplex sur tout un corpus Full-Duplex-Bench.
 
 Chaque dossier d'échantillon contient un `input.wav` ; on y écrit un
 `output.wav` de la même durée, prêt pour l'alignement puis l'évaluation.

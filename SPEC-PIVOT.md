@@ -173,11 +173,13 @@ IU donne le **transport**, pas le modèle du tour. Les deux sont complémentaire
 
 ### Le nom
 
-**`microturn` est libre partout (PyPI, npm, crates.io) mais mauvais pour ce périmètre.** « micro-turn » n'existe pas dans la littérature, et pour quelqu'un du domaine un « tout petit tour de parole » *est* un backchannel — le nom pointe donc vers le plus mineur de nos états.
+**Nom retenu : `zeroduplex`, décision d'Alex du 2026-09-13** (voir § 11). Le projet s'appelait jusque-là `microturn`.
 
-Candidats libres et vérifiés : **turnstream** (aucune collision, nulle part), **floorstate** (le plus juste conceptuellement), **turnfsm** (exact, laid).
+Le raisonnement qui a conduit à abandonner l'ancien nom reste valable : **`microturn` était libre partout (PyPI, npm, crates.io) mais mauvais pour ce périmètre.** « micro-turn » n'existe pas dans la littérature, et pour quelqu'un du domaine un « tout petit tour de parole » *est* un backchannel — le nom pointait donc vers le plus mineur de nos états.
 
-Décision non prise. Si le nom reste, lui adosser une tagline descriptive et des mots-clés `turn-taking`, `end-of-turn`, `EOU`, `backchannel`, `endpointing`.
+Candidats libres et vérifiés à l'époque (02/09) : **turnstream** (aucune collision, nulle part), **floorstate** (le plus juste conceptuellement), **turnfsm** (exact, laid).
+
+Quel que soit le nom, lui adosser une tagline descriptive et des mots-clés `turn-taking`, `end-of-turn`, `EOU`, `backchannel`, `endpointing`.
 
 ---
 
@@ -245,7 +247,11 @@ On croyait que le prix de la séparation était la latence. **C'est faux : elle 
 
 ## 11. Le nom
 
-**Décision du 02/09 : on garde `microturn` pour l'instant.** Le § 8 explique pourquoi ce n'est pas le bon nom pour ce périmètre ; ce n'est pas bloquant, et le renommage peut attendre que le périmètre soit stabilisé. Candidats libres si on renomme : `turnstream`, `floorstate`, `turnfsm`.
+**Décision d'Alex du 2026-09-13 : le projet s'appelle `zeroduplex`** (en un mot).
+
+Un premier choix, `zeroturn`, a été abandonné le même jour.
+
+Historique : le 02/09, on avait gardé `microturn` pour l'instant. Le § 8 explique pourquoi ce n'était pas le bon nom pour ce périmètre ; ce n'était pas bloquant, et le renommage pouvait attendre que le périmètre soit stabilisé. Candidats libres envisagés alors : `turnstream`, `floorstate`, `turnfsm`.
 
 ---
 

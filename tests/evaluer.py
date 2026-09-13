@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Évalue une session de microturn selon les métriques de Full-Duplex-Bench.
+"""Évalue une session de zeroduplex selon les métriques de Full-Duplex-Bench.
 
 Full-Duplex-Bench (arXiv 2503.04721) évalue **quand** un système parle, pas ce
 qu'il dit. On reprend ses métriques telles quelles : ça rend nos chiffres

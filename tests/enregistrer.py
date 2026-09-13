@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Enregistrement guidé des cas de test de microturn — avec la vraie voix d'Alex.
+"""Enregistrement guidé des cas de test de zeroduplex — avec la vraie voix d'Alex.
 
 Une voix de synthèse est trop propre : whisper la transcrit parfaitement, alors
 qu'il peine sur de la parole réelle. Régler le système sur de la synthèse, ce
@@ -17,7 +17,7 @@ import json, os, subprocess, sys, time
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 PRISES = os.path.join(ICI, "prises")
-MIC = os.environ.get("MICROTURN_MIC", "default")
+MIC = os.environ.get("ZERODUPLEX_MIC", "default")
 
 CAS = [
     {"id": "01-pause-milieu", "texte_impose": 'je voudrais [pause] allumer la lumière du salon', "duree": 9, "dimension": "pauses",

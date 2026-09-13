@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Étage STT de microturn — produit des événements de transcription dans une queue.
+"""Étage STT de zeroduplex — produit des événements de transcription dans une queue.
 
 Deux moteurs derrière le même contrat. Chacun tourne dans SON thread et ne fait
 que lire l'audio et poser des événements ; il ne bloque jamais sur autre chose.
@@ -24,8 +24,8 @@ import numpy as np
 import audio
 
 # Exactement le modèle mesuré sur le Pi. Surchargeable pour comparer deux
-# tailles sur le même audio : `MICROTURN_WHISPER=models/ggml-base-q5_1.bin`.
-WHISPER_MODEL = os.environ.get("MICROTURN_WHISPER", "models/ggml-tiny-q5_1.bin")
+# tailles sur le même audio : `ZERODUPLEX_WHISPER=models/ggml-base-q5_1.bin`.
+WHISPER_MODEL = os.environ.get("ZERODUPLEX_WHISPER", "models/ggml-tiny-q5_1.bin")
 VOSK_DIR = "models/vosk-model-small-fr-0.22"
 
 # whisper n'a pas de transcription incrémentale : on lui redonne tout le tour à
@@ -339,14 +339,14 @@ class Rejeu:
 
 
 
-# Un modèle par langue. `MICROTURN_SHERPA` l'emporte : c'est un réglage de la
+# Un modèle par langue. `ZERODUPLEX_SHERPA` l'emporte : c'est un réglage de la
 # machine, la table n'est qu'un défaut. Les noms de fichiers diffèrent d'un
 # modèle à l'autre, ils sont déduits du dossier (cf. `Sherpa._suffixe`).
 SHERPA_MODELES = {
     "fr": "models/sherpa-onnx-streaming-zipformer-fr-2023-04-14",
     "en": "models/sherpa-onnx-streaming-zipformer-en-2023-06-26",
 }
-SHERPA_DIR = os.environ.get("MICROTURN_SHERPA", "")
+SHERPA_DIR = os.environ.get("ZERODUPLEX_SHERPA", "")
 
 
 class Sherpa:
@@ -377,7 +377,7 @@ class Sherpa:
             raise SystemExit(
                 f"pas de modele sherpa pour « {langue} » dans {path}.\n"
                 f"  Modeles connus : {', '.join(SHERPA_MODELES)}\n"
-                f"  Ou pose MICROTURN_SHERPA sur un dossier de modele.")
+                f"  Ou pose ZERODUPLEX_SHERPA sur un dossier de modele.")
         # Le nom des fichiers change d'un modèle à l'autre : le français de
         # 2023-04-14 est en `epoch-29-avg-9-with-averaged-model`, l'anglais de
         # 2023-06-26 en `epoch-99-avg-1-chunk-16-left-128`. Le coder en dur
@@ -407,7 +407,7 @@ class Sherpa:
             # prend la parole, pas sur une durée. À 60 s elle ne garantit plus
             # qu'une chose — qu'un tour d'une minute finisse par se fermer.
             rule3_min_utterance_length=float(
-                os.environ.get("MICROTURN_SHERPA_TOUR_MAX", "60")))
+                os.environ.get("ZERODUPLEX_SHERPA_TOUR_MAX", "60")))
         self.flux = self.rec.create_stream()
         self.fige = ""
         self.recolles = 0                # coupures recollées sans espace

@@ -9,7 +9,7 @@
 # par défaut : le pipeline et piper les prennent sans le moindre argument.
 set -euo pipefail
 
-etat=~/.cache/microturn-echo-cancel
+etat=~/.cache/zeroduplex-echo-cancel
 
 case "${1:-}" in
 on)

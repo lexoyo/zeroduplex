@@ -1,8 +1,8 @@
 # DEMOS.md — les trois démos des chercheurs, comme cahier des charges
 
-Ce fichier n'est pas une fiche de lecture du papier (ça, c'est `PAPIER.md`) ni un relevé de format (`FORMAT-CHERCHEURS.md`). C'est **la liste de ce que leur système sait faire en public**, transcrite mot à mot, pour servir de cible : ce que microturn devra savoir refaire, et l'état d'aujourd'hui en face.
+Ce fichier n'est pas une fiche de lecture du papier (ça, c'est `PAPIER.md`) ni un relevé de format (`FORMAT-CHERCHEURS.md`). C'est **la liste de ce que leur système sait faire en public**, transcrite mot à mot, pour servir de cible : ce que zeroduplex devra savoir refaire, et l'état d'aujourd'hui en face.
 
-**Aucun chiffre de ce fichier n'est une mesure de microturn**, et une démo n'est pas une mesure du tout — c'est une prise réussie, montrée par ses auteurs. Elle dit ce que le système *peut* faire, jamais à quelle fréquence il le fait. Nos mesures vivent dans `RESULTATS.md`, `RESULTATS-PI.md` et `bench/JOURNAL.md`.
+**Aucun chiffre de ce fichier n'est une mesure de zeroduplex**, et une démo n'est pas une mesure du tout — c'est une prise réussie, montrée par ses auteurs. Elle dit ce que le système *peut* faire, jamais à quelle fréquence il le fait. Nos mesures vivent dans `RESULTATS.md`, `RESULTATS-PI.md` et `bench/JOURNAL.md`.
 
 ## Sources
 
@@ -188,7 +188,7 @@ Pire que l'omission, la formulation : le résumé écrit *« **Lastly**, you sou
 | **2. User backchannel + interruption** | ignorer deux backchannels utilisateur **pendant** qu'on parle, puis s'arrêter à la vraie interruption — dans la même séquence | **une ligne de prompt et un ET logique dans l'hôte.** Pas un état à donner au modèle |
 | **3. Assistant backchannel** | émettre `[Mhmm.]` en tête de réponse, plus une interruption en fin | **une ligne de prompt et un lecteur de clips dans l'hôte.** Le jeton existe, le code le ramène à « ne prends pas la parole » |
 
-### L'état côté microturn, sans arrondir
+### L'état côté zeroduplex, sans arrondir
 
 **L'interruption se déduit dans l'hôte, et le jeton disparaît.** Un `<user is speaking>` reçu pendant que l'hôte lit une réponse **est** une interruption : l'hôte est le seul à savoir qu'il parle, et il le sait exactement — par état interne, pas par inférence. On remplace un marqueur qui ne sortait jamais par un ET logique déterministe. `<user is interrupting>` est donc voué à être **retiré du catalogue** (`PLAN-REPRO.md`, étape 3.1). Rien à ajouter dans l'entrée du modèle, et la règle de `SPEC-PIVOT.md` § 2 tient : ce n'est pas l'observateur qui déduit, c'est l'appelant.
 

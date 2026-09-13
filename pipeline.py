@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""microturn — conversation en flux continu, sans détecteur de parole.
+"""zeroduplex — conversation en flux continu, sans détecteur de parole.
 
     ┌─ thread audio ─┐      ┌─ boucle d'état ─┐      ┌─ thread décideur ─┐
     │ lit le micro   │─────▶│ tient l'état    │─────▶│ 1 appel en vol    │
@@ -65,7 +65,7 @@ MICRO_TOURS = 270
 # Nombre de ticks sans texte neuf exigés avant d'autoriser une prise de parole.
 # 0 = pas de garde (défaut). Voir le candidat 59 : ça coûte 1,2 s de latence par
 # tick, sur une latence mesurée à 0,33 s — le remède peut être pire que le mal.
-TICKS_SILENCE = int(os.environ.get("MICROTURN_TICKS_SILENCE", "0"))
+TICKS_SILENCE = int(os.environ.get("ZERODUPLEX_TICKS_SILENCE", "0"))
 # Banc « détection seule » : un prompt qui ne rend que {"m": ...} (sans "r")
 # tombe dans `parler_sans_texte`, ne prend JAMAIS la parole, et rend 0,500 —
 # exactement le score d'un système muet. Mesurer une variante de détection
@@ -75,7 +75,7 @@ TICKS_SILENCE = int(os.environ.get("MICROTURN_TICKS_SILENCE", "0"))
 # qui compte, puisqu'elle fixe la durée simulée de la parole ; on la cale sur
 # la médiane des réponses de la base (55 caractères, mesuré le 02/09/2026).
 # Le prompt, lui, n'est pas touché : c'est le harnais qui s'adapte.
-MARQUEUR_SEUL = os.environ.get("MICROTURN_MARQUEUR_SEUL") or ""
+MARQUEUR_SEUL = os.environ.get("ZERODUPLEX_MARQUEUR_SEUL") or ""
 # Il n'y a plus de GRACE_ECHO : ignorer le micro pendant 0,4 s ne servait à rien
 # face à une réponse de 3 à 5 s, et l'allonger aurait tué le barge-in. C'est
 # `audio.Porte` qui traite l'écho maintenant, en le mesurant au lieu de parier
@@ -165,7 +165,7 @@ class Session:
         # s'est répété. Vide = repliage silencieux (l'historique raccourcit mais
         # le modèle ne sait pas que ça dure) — c'est le défaut historique, aligné
         # sur les chercheurs qui n'ont qu'un marqueur de silence.
-        self.repete_suffixe = os.environ.get("MICROTURN_REPETE", "×{n}")
+        self.repete_suffixe = os.environ.get("ZERODUPLEX_REPETE", "×{n}")
         self.bruit_sans_texte = cat["divers"]["bruit_sans_texte"]
         self.tour_en_cours = cat["divers"]["tour_en_cours"]
         self.silences = 0           # longueur de la série de répétitions
@@ -979,7 +979,7 @@ class Session:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="microturn — conversation en flux continu")
+    ap = argparse.ArgumentParser(description="zeroduplex — conversation en flux continu")
     ap.add_argument("fichier", nargs="?", help="WAV à rejouer (sinon micro)")
     # sherpa par défaut : seul moteur qui tienne le temps réel sur un Pi 3B
     # (244 ms par bloc de 300 ms à 2 threads, contre 4,3 s par passe pour

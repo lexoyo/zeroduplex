@@ -1,4 +1,4 @@
-# English catalogue for microturn. Kept in step with `fr.toml`: same control
+# English catalogue for zeroduplex. Kept in step with `fr.toml`: same control
 # tokens as DuplexCascade (`FORMAT-CHERCHEURS.md`), same JSON-constrained output,
 # same structure. It is what makes the researchers' English benchmark runnable
 # without touching the rest of the system.

@@ -27,7 +27,7 @@ le sujet.
 import argparse, glob, json, os, resource, subprocess, sys, time
 
 ICI = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODELE = os.environ.get("MICROTURN_MODELE")
+MODELE = os.environ.get("ZERODUPLEX_MODELE")
 DELAI_MAX = 12.0        # au-delà, une réponse ne répond plus à la question
 # Fenêtre pendant laquelle une prise de parole compte comme une intrusion dans
 # une pause. Chez eux elle vaut 1,0 s ; c'est plus court que notre temps de
@@ -207,10 +207,10 @@ def evalue(dossier, muet=True):
 
     # Le répertoire de trace était fixe : deux passes lancées EN PARALLÈLE sur
     # la même session se l'écrasaient l'une l'autre, et la seconde mesurait la
-    # trace de la première. `MICROTURN_TRACE` donne à chaque passe le sien —
+    # trace de la première. `ZERODUPLEX_TRACE` donne à chaque passe le sien —
     # sans quoi le seul moyen de mesurer trois passes reste la série, soit
     # quarante minutes de réseau pour cinq minutes de travail.
-    base = os.environ.get("MICROTURN_TRACE") or "/tmp"
+    base = os.environ.get("ZERODUPLEX_TRACE") or "/tmp"
     trace = os.path.join(base, "rejeu_" + os.path.basename(dossier.rstrip("/")))
     subprocess.run(["rm", "-rf", trace])
     # `--deterministe` : horloge virtuelle, appel bloquant. Sans lui le rejeu
