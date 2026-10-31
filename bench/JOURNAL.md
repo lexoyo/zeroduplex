@@ -1412,3 +1412,31 @@ mesurer alors contre A, pas contre le contrôle.
 - **Le dépôt a bougé sous la mesure.** `llm.py` a été modifié par Alex pendant
   les passes ; les copies gelées portent la version de `752f20d`, vérifiée
   identique fichier par fichier avant de conclure.
+
+## Petits modèles non fine-tunés, prompt figé, banc voix humaine et FDB — 31/10/2026
+
+Code `sources_sha256 9a68855c41cabf55` (git `98ff5d2`, puis `86812c4` qui ne touche que les notes), prompt anglais tel quel, une passe à la fois, `pipeline.py --rendu` sans `--muet` comme le 10/09. Seule variable : le décideur. Archive complète (mp3, réponses, traces sans WAV, scripts, sorties FDB) hors dépôt : `~/_/agents/lab-agent/experiments/2026-10-31_zeroduplex-petits-modeles/`.
+
+**Historique** : pas de bug. Avec gemini il grandit de 2 à 64 messages sur `2-interruption`. Le vide vu en local venait du chien de garde (relance à 4,8 s, réponses à 30 s jetées comme périmées).
+
+**Vérification préalable** (5 prompts réels) : Gemma 3 27B et Llama 3.1 8B jouables. Mistral Small 3.2 24B non jouable (écrit une réponse longue dans `r` à chaque tick, plus de 15 s sans plafond de jetons). Ministral 8B n'est plus servi. Qwen 2.5 7B (fournisseur unique dégradé) et gemini-flash-lite (429 en amont, 87 erreurs sur 252 appels en passe 1) non mesurables ce jour : **pas de référence re-mesurée**.
+
+**Banc voix humaine, fins de tour /16 sur 5 passes** :
+
+- Llama 3.1 8B : 9, 11, 8, 11, 9, soit **9,6 ± 1,3** ; pauses 4/4 aux cinq passes ; 1 erreur décideur sur ~1 250 appels ; latence médiane de réponse 2,08 s.
+- Gemma 3 27B : 4, 7, 8, 4, 10, soit **6,6 ± 2,6** ; pauses 4/4 aux cinq passes ; 75 erreurs sur ~900 (timeouts 1,5 s) ; 2,96 s.
+
+Gemma perd ses fins de tour par timeout : la réponse s'écrit dans le même appel que le marqueur, et dépasse le budget. Sur `1-questions` il fait 0 à 4 sur 6, sur `4-hesitations` 2 à 4 sur 4.
+
+Pour mémoire, 10/09 sur un code antérieur (`d656ecd`) : gemini 11,8 ; qwen-2.5-7b 10,4 ; llama-3.2-3b 7,8.
+
+**Full-Duplex-Bench, une passe, mêmes 15 échantillons, justesse partout** (pauses Candor, pauses synthétiques, prise de tour, interruption, ne pas parler par-dessus ; moyenne) :
+
+- système muet : 1, 1, 0, 0, 1 ; **0,600**
+- Llama 3.1 8B : 0,467, 0,933, 0,733, 0,667, 0,267 ; **0,613**
+- Gemma 3 27B : 0,533, 0,933, 0,400, 0,467, 0,600 ; **0,587**
+- pour mémoire 10/09 : gemini 0,653, qwen-2.5-7b 0,494 ; DuplexCascade 0,858
+
+Exécuté sur une copie des 75 échantillons pour ne pas écraser les sorties du 10/09. Moyennes à la main, TOR backchannel relu avec `eval_backchannel.py`. **Aucun des deux ne se détache du mutisme sur FDB.**
+
+Coût : 0,89 sur la clé recherche pour toute la journée.

@@ -1303,6 +1303,24 @@ Test demandé avant toute mesure : rejeu du clip `2-interruption` (voix humaine)
 
 **Ce que le test fait apparaître, et qui compte pour la mesure** : les 429 en amont existent. Le banc qui suit compte désormais les erreurs du décideur par passe, pour qu'une passe dégradée par le réseau ne se lise pas comme une passe ratée par le modèle.
 
+### La dernière mesure : un 8B tient les pauses et la moitié des fins de tour, et le banc des chercheurs ne le distingue pas du silence — 31/10
+
+Mesure faite selon le plan arrêté par Alex : trois petits modèles, prompt figé, cinq passes sur le banc voix humaine, puis FDB sur les deux meilleurs. Chiffres et méthode dans `bench/JOURNAL.md` (entrée du 31/10), archive audio et traces dans `lab-agent/experiments/2026-10-31_zeroduplex-petits-modeles/`.
+
+**Ce qui est mesuré, sans angle présumé :**
+
+- **Llama 3.1 8B, non fine-tuné, fait 9,6 fins de tour sur 16 (± 1,3) et tient les 4 pauses aux cinq passes**, avec une latence de décision de 0,31 s et une réponse audible à 2,08 s en médiane. C'est le niveau du modèle de base des chercheurs prompté le 10/09 (10,4), sous gemini (11,8), sur un code un peu différent.
+- **Gemma 3 27B fait moins bien que le 8B (6,6 ± 2,6), et pas parce qu'il juge mal** : il ne répond pas à temps. Le dispositif lui demande d'écrire le marqueur et la réponse dans le même appel, sous 1,5 s ; chez son fournisseur, la réponse ne tient pas dans ce budget, l'appel est perdu, et la fin de tour avec. Sur le scénario où il n'a presque rien à dire (`4-hesitations`), il fait aussi bien que les autres. **Le plus gros n'est pas le meilleur ici, et la cause est mécanique** : c'est un argument pour séparer la décision de la génération de la réponse, à écrire comme limite ou comme travail futur.
+- **Sur Full-Duplex-Bench, aucun des deux ne se distingue d'un système muet** : 0,613 et 0,587 contre 0,600. Les profils sont opposés (Llama parle par-dessus l'ICC, Gemma se tait trop en prise de tour) et se compensent dans la moyenne. Ce banc ne porte donc pas la thèse, ce qui confirme le choix du 31/10 de la démontrer sur la voix humaine.
+
+**Ce que la journée apprend sur le dispositif lui-même :**
+
+- **La disponibilité des modèles est une variable.** Le même jour, sur six candidats : un n'est plus servi (Ministral 8B), un fournisseur unique est en panne (Qwen 2.5 7B), un modèle de référence est rationné en amont (gemini, une passe à 35 % d'erreurs, déclarée invalide). Il n'y a donc **aucune référence re-mesurée avec ce code**. Un système « sans entraînement, sur n'importe quel modèle » dépend de ce que les fournisseurs servent ce jour-là, et le papier doit le dire.
+- **Le schéma JSON strict ne suffit pas à rendre un modèle jouable** : Mistral Small 24B l'accepte et remplit quand même le champ de réponse à chaque tick, d'où 15 s par appel. La contrainte garantit la forme, pas la sobriété.
+- **Compter les erreurs du décideur par passe a changé la lecture** : sans ce compte, la passe gemini (7/16) et la première passe Gemma auraient été lues comme des scores de modèle.
+
+**Réserves à porter avec ces chiffres** : une voix, 16 fins de tour, un jour ; prompt réglé sur gemini avec ces mêmes clips ; références du 10/09 sur un code antérieur.
+
 ## Angle d'article en réserve : « fine-tuning vs prompting »
 
 **Proposé par Alex le 03/09 au soir.** Consigné **ici et pas dans `IDEES.md`** : `IDEES.md` est un parking d'**hypothèses falsifiables sur le système**, chacune avec son protocole de mesure. Ceci est un **angle éditorial**, il n'a rien à falsifier — sa place est dans le fichier qui porte le plan de l'article.
