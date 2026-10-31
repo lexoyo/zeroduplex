@@ -1257,6 +1257,52 @@ Tous archivés hors dépôt, dans `ideas/demos-audio/` du workspace d'idea-lab :
 
 *Et l'état d'avant le correctif ne s'est pas perdu* : les scores et les traces du 10/16 sont dans l'historique du workspace d'idea-lab, au commit `8a10f4ea`, que `84bb1dd9` a remplacé sur place. Le « avant » de la ligne 10/16 → 15/16 est donc auditable, ce qui n'était pas le cas du « 13/16 » du 04/09.
 
+### La thèse arrêtée, et la dernière mesure — 31/10
+
+Reprise après sept semaines sans activité sur le dépôt (dernier commit le 13/09). Alex demande où en sont les articles : celui-ci n'est pas rédigé. Cette entrée garde la journée telle qu'elle s'est passée, **sans présumer de l'angle** : Alex, verbatim, *« continuer à noter tout ce qu'on fait dans les logs de cet article pour qu'on puisse après faire un article à partir de tout ce qu'on fait, sachant que je ne sais pas encore quel angle on va lui donner. »* Ce fichier reste le **seul** journal de l'article (un second, ouvert par erreur chez leads-agent le même jour, a été reversé ici puis supprimé).
+
+#### Le Raspberry Pi sort du périmètre de ce papier
+
+Alex : *« On s'en fout du Raspberry Pi pour cet article-là. […] propose-moi plusieurs trames […] le but, c'est de faire un papier de recherche. »* Les alertes techniques liées au Pi ne bloquent plus. La base sherpa était déjà tranchée à 0,807 dans ces notes. Cinq trames de papier ont été rédigées par un sous-agent et relues par un QC indépendant : `03_zeroduplex-trames-papier.md` (chez leads-agent).
+
+#### Découverte du QC, à garder quel que soit l'angle : un système muet fait 0,600 sur Full-Duplex-Bench
+
+Sur l'Averaged Turn-Taking Accuracy, le harnais compte **1 − TOR** sur les deux tâches de pause et sur le backchannel, et **TOR** sur la prise de tour et l'interruption. Un système qui ne dit jamais rien obtient donc 1 sur trois tâches et 0 sur deux : **0,600**. Notre 0,653 (gemini) n'est que **0,05 au-dessus du mutisme** ; le modèle de base des chercheurs prompté (0,494) est **en dessous**. Le tableau du `README.md` mélange justesse (nos colonnes) et TOR brut (leur colonne) sur les pauses, ce qui cache l'écart. Et l'évaluateur de prise de tour **plante** sur un système muet (liste de latences vide) : la borne se calcule, elle ne se mesure pas avec leur outil tel quel.
+
+#### Alex recadre la thèse, en deux temps
+
+D'abord : *« Le but, c'est de dire comment on peut rendre full duplex des modèles qui ne le sont pas, et en particulier des petits modèles aussi, et que les performances sont acceptables pour faire vraiment du full duplex, des vraies conversations, c'est tout. Est-ce que déjà vérifier, est-ce que c'est le cas ? »*
+
+Réponse sur l'existant : **non démontré.** Sous 8B, échec (llama 1B et 3B ; qwen 7B parle par-dessus l'utilisateur 14 fois sur 15 sur FDB). llama-3.3-70b marche (0,824 contre 0,807 pour gemini, une passe, sur nos sessions). Rien entre 8B et 70B n'avait été testé, ni Luciole. Et le prompt a été réglé sur gemini. Alex fixe la borne : *« 27b c'est petit »*, donc **petit = 27B et moins**.
+
+Puis, en fin de journée, la thèse arrêtée : *« On veut pas faire un papier qui compare les deux. On veut faire un papier qui montre que c'est possible d'avoir une vraie conversation avec un modèle non fine-tuné et qui fait du full duplex. »* La comparaison avec DuplexCascade reste, mais secondaire : *« C'est pas grave qu'on soit moins bien. […] c'est bien aussi de comparer. C'est loin d'être le seul intérêt. »*
+
+#### Le banc change de rôle
+
+Alex : *« Est-ce qu'on ferait pas mieux de tester sur nos prompts, nos conversations […] que j'ai enregistrées avec ma pote là ? »* Retenu : **la thèse se démontre sur le banc voix humaine** (quatre scénarios, son amie anglophone), FDB ne sert qu'à se situer face aux chercheurs. Deux réserves posées par lab-agent, à porter dans le papier : 16 fins de tour c'est peu (un écart de 1/16 est du bruit, d'où 5 passes minimum), et le prompt a été réglé sur gemini avec ces mêmes clips, donc gemini est avantagé ; il faudrait un cinquième scénario enregistré **après** le réglage pour un chiffre final non contaminé.
+
+#### Le plan de mesure, réduit par Alex
+
+lab-agent proposait sept modèles et deux conditions (prompt tel quel, puis variantes ciblées). Alex réduit les deux : **trois modèles** (Gemma 3 27B, Mistral Small 24B, un 8B), Luciole ensuite, et **pas de variantes de prompt** : *« je vois pas pourquoi tu veux faire des variantes du prompt […] On a déjà fait tout ça […] c'est l'ultime dernière étape de mesure. »* Le prompt actuel, figé, pour tous ; un modèle qui échoue est un résultat, il va dans les limites. Feu vert : *« Ok, ça me va, tu peux lancer les tests. »*
+
+Constat ops du même jour, qui borne le « local » : sur la machine d'Alex (4 Go de VRAM), Qwen 2.5 7B Q4 a mis **8 à 30 s par tick** contre un budget de 1,5 s. Les modèles de 27B et moins passent donc par API, ou par un GPU loué pour Luciole.
+
+#### Les accidents d'infrastructure de la journée
+
+- La clé OpenRouter de `.env` était cassée (401 « User not found », 47 appels sur 47). Remplacée par la clé recherche d'Alex (payée par Internet de France, limite 20 par jour, recherche uniquement, **jamais de données réelles**). Le ZDR a été levé sur le compte : gemini-flash-lite répond de nouveau.
+- OLMo 2 32B n'est plus servi sur OpenRouter ; Qwen 2.5 7B expirait chez son fournisseur ce jour-là.
+- Le prompt typique demandé par Alex a été extrait d'un rejeu réel du clip `2-interruption` (traces dans `lab-agent/sandboxes/zeroduplex-prompt-type/`). Il a fait apparaître un soupçon : les huit premiers appels partaient **sans historique**. Vérifié le jour même, voir l'entrée suivante.
+
+### Le décideur voit bien l'historique ; ce qui le privait de contexte, c'est le chien de garde en local — 31/10
+
+Test demandé avant toute mesure : rejeu du clip `2-interruption` (voix humaine) avec gemini-flash-lite, même code que le banc (`98ff5d2`), et lecture de la taille de `messages` dans chaque `llm_appel` de la trace.
+
+**Pas de bug.** L'historique grandit d'un micro-tour par décision rendue : 2, 4, 6… jusqu'à 64 messages en fin de clip. Les seuls appels partis sans historique sont les six premiers, et pour une raison qui n'a rien à voir : **cinq réponses 429** (« temporarily rate-limited upstream ») en amont chez Google, dans les six premières secondes. Une erreur n'écrit pas l'historique et remet `vu` à vide, par construction, pour que l'énoncé reparte entier au tick suivant.
+
+**Le soupçon venait du rejeu local de la veille**, et il s'explique par le code : avec Qwen 7B sur le CPU (8 à 30 s par appel), le chien de garde déclare l'appel perdu au bout de 4 × 1,2 s et en relance un autre, qui attend derrière le verrou du décideur. Chaque réponse qui finit par revenir porte un numéro de séquence périmé, elle est jetée, et l'historique n'est donc jamais écrit. **Ce n'est pas un défaut du système mesuré, c'est l'effet d'un décideur dix fois trop lent pour l'horloge.** Rien n'a été corrigé ; c'est une limite à écrire telle quelle si l'article parle du local.
+
+**Ce que le test fait apparaître, et qui compte pour la mesure** : les 429 en amont existent. Le banc qui suit compte désormais les erreurs du décideur par passe, pour qu'une passe dégradée par le réseau ne se lise pas comme une passe ratée par le modèle.
+
 ## Angle d'article en réserve : « fine-tuning vs prompting »
 
 **Proposé par Alex le 03/09 au soir.** Consigné **ici et pas dans `IDEES.md`** : `IDEES.md` est un parking d'**hypothèses falsifiables sur le système**, chacune avec son protocole de mesure. Ceci est un **angle éditorial**, il n'a rien à falsifier — sa place est dans le fichier qui porte le plan de l'article.
